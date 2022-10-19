@@ -4,10 +4,7 @@
 
 Modules Python nécessaires:
 
-- ast
 - tkinter
-- tkinterdnd2
-- turtle
 - PyPDF2
 - io
 - reportlab
