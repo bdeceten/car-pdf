@@ -17,6 +17,8 @@ class App():
 
         self.root = Tk()
         self.root.title('Car PDF')
+        self.root.tk.call('wm', 'iconphoto', self.root._w,
+                          PhotoImage(file='ressources/logo_ceten.png'))
 
         self.root.geometry('700x350')
         self.root.resizable(0, 0)
