@@ -14,48 +14,59 @@ class App():
             filetypes = [('PDF files', '*.pdf')]
             filePath = filedialog.askopenfilename(
                 title='Open a file', initialdir='/', filetypes=filetypes)
+            if filePath != None and filePath != "":
+                self.canvas.itemconfigure(
+                    self.pdfText, text="Fichier sélectionné", fill="green")
+            else:
+                self.canvas.itemconfigure(
+                    self.pdfText, text="Document de location\nrempli par le locataire (.pdf) :", fill="red")
 
         self.root = Tk()
         self.root.title('Car PDF')
         self.root.tk.call('wm', 'iconphoto', self.root._w,
                           PhotoImage(file='ressources/logo_ceten.png'))
 
-        self.root.geometry('700x350')
+        self.root.geometry('500x375')
         self.root.resizable(0, 0)
 
-        self.canvas = Canvas(self.root, width=700, height=350)
+        self.canvas = Canvas(self.root, width=500, height=350)
         self.canvas.pack(fill="both", expand=True)
 
-        self.prenomEntry = Entry(self.root, width=50)
-        self.nomEntry = Entry(self.root, width=50)
-        self.dateEntry = Entry(self.root, width=50)
-        self.kmEntry = Entry(self.root, width=50)
+        self.prenomEntry = Entry(self.root, width=25)
+        self.nomEntry = Entry(self.root, width=25)
+        self.dateEntry = Entry(self.root, width=25)
+        self.kmEntry = Entry(self.root, width=25)
         self.pdfEntry = Button(
-            self.root, text="Open Folder", command=getFilePath)
+            self.root, text="Sélectionner le fichier", command=getFilePath)
 
-        # self.pdfEntry.pack(fill=X, padx=10)
-        # self.pdfEntry.drop_target_register(DND_FILES)
-        # self.pdfEntry.dnd_bind('<<Drop>>', self.DropPdf)
+        self.prenomText = self.canvas.create_text(
+            100, 50, text="Prénom du locataire :")
+        self.nomText = self.canvas.create_text(
+            100, 100, text="Nom du locataire :")
+        self.dateText = self.canvas.create_text(
+            100, 150, text="Date de location :")
+        self.kmText = self.canvas.create_text(
+            100, 200, text="Kilométrage à la\nremise des clés :")
+        self.pdfText = self.canvas.create_text(
+            100, 250, text="Document de location\nrempli par le locataire (.pdf) :")
 
-        self.prenomText = self.canvas.create_text(100, 50, text="Prénom")
-        self.nomText = self.canvas.create_text(100, 100, text="Nom")
-        self.dateText = self.canvas.create_text(100, 150, text="Date")
-        self.kmText = self.canvas.create_text(100, 200, text="Km")
-        self.pdfText = self.canvas.create_text(100, 250, text="Pdf")
+        self.bienvenue = self.canvas.create_text(
+            250, 15, text="Bienvenue sur Car PDF !")
+        self.errorText = self.canvas.create_text(250, 330, text="", fill='red')
+        self.credits = self.canvas.create_text(
+            250, 360, text='Made by Louis THOMAS, promotion 2023')
 
-        self.errorText = self.canvas.create_text(400, 330, text="")
+        self.canvas.create_window(300, 50, window=self.prenomEntry)
+        self.canvas.create_window(300, 100, window=self.nomEntry)
+        self.canvas.create_window(300, 150, window=self.dateEntry)
+        self.canvas.create_window(300, 200, window=self.kmEntry)
+        self.canvas.create_window(300, 250, window=self.pdfEntry)
 
-        self.canvas.create_window(400, 50, window=self.prenomEntry)
-        self.canvas.create_window(400, 100, window=self.nomEntry)
-        self.canvas.create_window(400, 150, window=self.dateEntry)
-        self.canvas.create_window(400, 200, window=self.kmEntry)
-        self.canvas.create_window(400, 250, window=self.pdfEntry)
-
-        self.button = Button(self.root, width=10,
-                             command=self.CreatePDF, text="Remplir")
+        self.button = Button(self.root, width=20,
+                             command=self.CreatePDF, text="Générer le PDF de logistique")
         self.button.bind("<Return>", self.CreatePDF)
 
-        self.canvas.create_window(400, 300, window=self.button)
+        self.canvas.create_window(250, 300, window=self.button)
 
         self.root.mainloop()
 
@@ -68,17 +79,17 @@ class App():
 
         if nom == "" or prenom == "" or date == "" or km == "" or pdf == "":
             self.canvas.itemconfigure(
-                self.errorText, text="Erreur : champ vide", fill="red")
+                self.errorText, text="Un ou plusieurs champs semblent être vides")
             return 0
 
         if not re.match(r"[0-9]{2}\/[0-9]{2}\/[0-9]{4}", date):
             self.canvas.itemconfigure(
-                self.errorText, text="Erreur : format de la date", fill="red")
+                self.errorText, text="Le format de la date doit être JJ/MM/AAAA")
             return 0
 
-        if not re.match(r"[1-9][0-9]*", km):
+        if not re.match(r"^[1-9][0-9]*$", km):
             self.canvas.itemconfigure(
-                self.errorText, text="Erreur : format des km", fill="red")
+                self.errorText, text="Le nombre de kilomètres doit être composé de chiffres uniquement")
             return 0
         try:
             pdfWriter = PdfFileWriter()
@@ -146,4 +157,6 @@ class App():
         except Exception:
             self.canvas.itemconfigure(
                 self.errorText, text="Erreur : chemin d'accès au pdf", fill="red")
+            self.canvas.itemconfigure(
+                self.pdfText, text="Document de location\nrempli par le locataire (.pdf) :", fill="red")
             return 0
